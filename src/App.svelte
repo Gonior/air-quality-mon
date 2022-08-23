@@ -176,11 +176,13 @@
                     dataset.data = [...filteredData];
                 });
                 myChart.update()
+
                 myChart2.data.datasets.forEach((dataset) => {
                     dataset.data = [...averageData];
                 });
                 myChart2.update()
-                
+                console.log(averageData)
+                console.log(filteredData)
             }, (errorObject) => {
                 console.log('The read failed: ' + errorObject);
             })
@@ -261,12 +263,14 @@ const toggleChartFunc = () => {
             <div class="w-1/2 flex flex-col items-center justify-center">
                 <h1 class="mb-4">The Latest PPM Value</h1>
                 <Speedometer
-                    value={ppm > 500 ? 500 : ppm}
+                    
+                    value={ppm > 4000 ? 4000 : ppm}
                     currentValueText ="{ppm} PPM"
-                    maxValue={500}
-                    segments={6}
-                    customSegmentStops={[0, 50, 100, 150, 200, 300, 500]}
-                    segmentColors={['#37F72B', '#EFE920', '#F69724',"#FB2D2D","#AE23FE","#000000"]}
+                    maxValue={4000}
+                    segments={8}
+                    
+                    segmentColors={['#37F72B', '#EFE920', '#F69724',"#FB2D2D","#AE23FE","#c0c0c0","#525E75","#000"]}
+                
                     needleColor="steelblue"
                     needleTransitionDuration={1000}
                     needleTransition="easeQuadInOut"
