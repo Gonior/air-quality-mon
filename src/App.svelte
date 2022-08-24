@@ -9,7 +9,7 @@
     
     let ppm = 0
     let Data = []
-    let ctx, chartCanvas, chartCanvas2,filteredData,myChart,myChart2, averageData = [], toggleChart = false
+    let ctx, chartCanvas, chartCanvas2,filteredData,myChart,myChart2, averageData = [], toggleChart = false, maxValue, minValue, avgValue
     $: filterDate = (new Date()).toJSON().slice(0, 10);
     
     const firebaseConfig = {
@@ -130,6 +130,13 @@
                 
                 averageData = [...averageData, dataPerHours]
             }
+            maxValue = Math.max(...Data.map(d => d.y))
+            minValue = Math.min(...Data.map(d => d.y))
+            let avg = 0
+            Data.forEach(item => {
+                avg += parseFloat(item.y)
+            })
+            avgValue = avg/Data.length
             
         }, {onlyOnce : true})
         setTimeout(() => {
@@ -181,12 +188,18 @@
                     dataset.data = [...averageData];
                 });
                 myChart2.update()
-                console.log(averageData)
-                console.log(filteredData)
+                maxValue = Math.max(...Data.map(d => d.y))
+                minValue = Math.min(...Data.map(d => d.y))
+                let avg = 0
+                Data.forEach(item => {
+                    avg += parseFloat(item.y)
+                })
+                avgValue = avg/Data.length
+                
             }, (errorObject) => {
                 console.log('The read failed: ' + errorObject);
             })
-        },0)
+        },500)
         
 
 
@@ -198,8 +211,8 @@
     })
 
     const pickADate = (e) => {
-
-        filteredData = [...Data.filter((d) => d.x.slice(0,10).replaceAll("/","-") === e.target.value)]
+        filterDate = e.target.value
+        filteredData = [...Data.filter((d) => d.x.slice(0,10).replaceAll("/","-") === filterDate)]
         myChart.data.datasets.forEach((dataset) => {
         dataset.data = [...filteredData];
         });
@@ -263,18 +276,20 @@ const toggleChartFunc = () => {
             <div class="w-1/2 flex flex-col items-center justify-center">
                 <h1 class="mb-4">The Latest PPM Value</h1>
                 <Speedometer
-                    
                     value={ppm > 4000 ? 4000 : ppm}
                     currentValueText ="{ppm} PPM"
                     maxValue={4000}
                     segments={8}
-                    
                     segmentColors={['#37F72B', '#EFE920', '#F69724',"#FB2D2D","#AE23FE","#c0c0c0","#525E75","#000"]}
-                
                     needleColor="steelblue"
                     needleTransitionDuration={1000}
                     needleTransition="easeQuadInOut"
                 />
+                <div class="flex items-center justify-center space-x-7 text-xs">
+                    <p>The Highest Value <b>{!maxValue ? "-" : maxValue}</b> PPM</p>
+                    <p>The Smallest Value <b>{!minValue? "-" : minValue}</b> PPM</p>
+                    <p>Average Value <b>{parseFloat(avgValue).toFixed(2)}</b> PPM</p>
+                </div>
             </div>
             <div class="w-1/2">
                 <div class="flex justify-between">
@@ -302,8 +317,9 @@ const toggleChartFunc = () => {
                 </div>            
             </div>
         </div>
-        <div class="flex items-center  flex-col justify-center mt-20">
-            <p class="">Index Air Quality Carbon Monoxide (CO) <a href="https://petrotrainingasia.com/bekerja-di-ruang-terbatas/" class="text-blue-500">Sumber</a></p>
+        
+        <div class="flex items-center  flex-col justify-center mt-10">
+            <p class="">Index Air Quality Carbon Monoxide (CO) <a href="https://petrotrainingasia.com/bekerja-di-ruang-terbatas/" class="text-blue-500">source</a></p>
             
             <table class="w-1/2">
                 <thead class="bg-white border-b">
